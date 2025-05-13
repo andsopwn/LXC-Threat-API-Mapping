@@ -27,7 +27,10 @@
 
 <br>
 
-# 1. Extract NVD List
+# 1. NVD API EXTRACTOR
++ Generate risk_db.json with CVE metadata, vulnerable APIs, EPSS score * percentil, CISA Key flag
++ Compatible with downstream threat_api_mapper.py enriched workflow.
+
 Usage
 ``` bash
 python3 nvd_api_extractor.py --cve CVE-2020-14343 CVE-2024-21591
@@ -73,8 +76,15 @@ risk_db.json
 </details>
 
 <br> 
+
 # 2. Threat API Mapper
-Usage
-``` bash
-python threat_api_mapper.py --code test_target/app --risk risk_db.json
-```
++ maps vulnerable API calls → CVE records and carries through enriched metadata such as EPSS, Exploit-DB ...
+
+| 목적 | 예시 명령 | 설명 |
+|-|-|-|
+| default | python3 threat_api_mapper.py --code ../test_target --risk risk_db.json | risk_db.json 또는 enriched 전체를 기준으로 API 매핑 |
+| Debug | python3 threat_api_mapper.py --code ../test_target --risk risk_db.json --debug | 매치될 때마다 콘솔에 MATCH ... 로 표시 |
+| EPSS 0.7 이상만 | python3 threat_api_mapper.py --code ../test_target --risk risk_db.json --min-epss 0.7 | epss 0.7 이상인 CVE만 고려하여 매핑 |
+| KEV 목록 CVE만 | python3 threat_api_mapper.py --code ../test_target --risk risk_db.json --kev-only | CISA KEV 카탈로그에 포함된 CVE만 대상 |
+| 모든 필터 & 커스텀 출력 경로 | python3 threat_api_mapper.py --code ../backend --risk ../data/risk_db_enriched.json --out ../report/threat_map_high.json --min-epss 0.9 --kev-only --debug | EPSS 0.7 이상 AND KEV에 있는 CVE만 결과를 리포트에 따로 저장하고 디버그 표시 |
+
