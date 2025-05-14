@@ -7,7 +7,7 @@ from graphviz import Digraph
 from . import ast_utils  # 노드 정보 기입 모듈
 
 '''
-    로드된 노드들의 정보를 통해 시각화하는 스크립트
+    로드된 노드들의 정보를 통해 시각화하는 스크립트, 시각화 후 외부 사용/내부에서만 사용/미사용 api 리스트를 반환
 '''
 
 def get_full_name(node: ast.AST) -> str:
@@ -219,3 +219,17 @@ def visualize_call_flow(
     graph.format = 'png'
     graph.render(output_path, cleanup=True)
     logging.info(f"Graph saved to {output_path}.png")
+
+    external_set = set()
+    internal_set = set()
+    for container_function, call_node, *_ in collected_target_calls:
+        api_name = get_full_name(call_node.func)
+        if container_function in external_functions:
+            external_set.add(api_name)
+        else:
+            internal_set.add(api_name)
+    target_labels = [f"{(m + '.') if m else ''}{f}" for m, f in target_call_list]
+    externally_exposed = sorted(external_set)
+    internally_only = sorted([api for api in internal_set if api not in external_set])
+    unused = sorted([api for api in target_labels if api not in external_set and api not in internal_set])
+    return externally_exposed, internally_only, unused
