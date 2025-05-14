@@ -30,7 +30,18 @@ def main():
         base=os.path.dirname(input_path) or '.'
         files=[input_path]
         logging.info(f"Single file mode: {input_path}")
-    ast_to_png.visualize_call_flow(files, base, args.output, targets, force)
+
+    external_apis, internal_only_apis, unused_apis = ast_to_png.visualize_call_flow(files, base, args.output, targets, force)
+    
+    print("Externally exposed APIs:")
+    for api in external_apis:
+        print(f"  {api}")
+    print("\nInternally only APIs:")
+    for api in internal_only_apis:
+        print(f"  {api}")
+    print("\nUnused APIs:")
+    for api in unused_apis:
+        print(f"  {api}")
 
 if __name__ == '__main__':
     main()
